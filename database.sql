@@ -1,7 +1,3 @@
--- Create Database if not exists
-CREATE DATABASE IF NOT EXISTS github_analyzer_db;
-USE github_analyzer_db;
-
 -- Create Table: github_profiles
 CREATE TABLE IF NOT EXISTS github_profiles (
     id INT AUTO_INCREMENT PRIMARY KEY,

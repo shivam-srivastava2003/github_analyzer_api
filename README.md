@@ -1,142 +1,149 @@
 # GitHub Profile Analyzer API
 
-A production-ready REST API built using **Node.js, Express, and MySQL** that fetches public GitHub profile data, analyzes user activity, calculates engagement metrics, and stores the results locally for high-performance cached access.
+## 📋 Project Overview
+The GitHub Profile Analyzer API is a production-ready REST service that retrieves, analyzes, and caches public statistics for GitHub user profiles and repositories. Built on Node.js, Express, and MySQL, the application computes user engagement metrics and identifies top languages and repositories, caching data locally for fast retrieval on subsequent requests.
 
 ---
 
-## 🚀 Features
-
-- **Automated Profile Analysis**: Calculates total stars, total forks, account age, and tracks repositories.
-- **Custom Analytics Engine**:
-  - Calculates an **Engagement Score**: `followers * 0.4 + repos * 0.3 + stars * 0.3`
-  - Assigns a **Profile Level**: `Beginner` (0-30), `Intermediate` (31-60), `Advanced` (61-80), `Expert` (81+)
-- **Repository Insights**:
-  - Complete language breakdown (counts repositories by main language).
-  - Identifies top 5 most starred repositories.
-- **High-Performance Caching**: Automatically saves processed profiles to a MySQL database and retrieves from cache on subsequent calls.
-- **Robust Endpoints**: Complete CRUD for profiles with support for sorting, pagination, and full-text searches.
-- **Production Security**: Configured with `helmet` for HTTP headers, standard `cors` configuration, and request `rate-limiting` (prevents DDoS and abuse).
-- **Interactive Swagger Docs**: Served directly at `/api-docs` using OpenAPI 3.0 specs.
-- **System Diagnostics**: Built-in `/health` health-check for DB connection and server state.
+## ✨ Features
+- **Automated Analytics Engine**: 
+  - Computes an **Engagement Score**: `(followers * 0.4) + (public_repos * 0.3) + (total_stars * 0.3)`.
+  - Determines a **Profile Level**: `Beginner` (0-30), `Intermediate` (31-60), `Advanced` (61-80), or `Expert` (81+).
+- **Repository Language Breakdown**: Counts how many repositories are written in each language.
+- **Top 5 Starred Repositories**: Lists the top 5 starred repositories with descriptions, counts, and URLs.
+- **Self-Healing Database Setup**: Automatically checks for, creates, and verifies the required database schemas and tables on server startup.
+- **Production Security**: Includes Helmet headers, CORS policies, and Express Rate Limiting.
+- **OpenAPI / Swagger**: Interactive API documentation served under `/api-docs`.
+- **System Health Diagnostics**: Connective check `/health` monitoring the database pool.
 
 ---
 
-## 🛠️ Tech Stack
-
-- **Runtime**: Node.js (v18+ recommended)
-- **Framework**: Express.js
-- **Database**: MySQL (v5.7+ / v8.0+)
-- **HTTP Client**: Axios (for communicating with GitHub REST API v3)
-- **Security**: Helmet, CORS, Express Rate Limit
-- **Documentation**: Swagger UI Express, Swagger JSDoc
-- **Configuration & Logging**: Dotenv, Morgan (Request Logger)
+## 🏗️ Architecture
+The project is built on **Clean Architecture** patterns, separating concerns cleanly:
+```text
+project/
+├── src/
+│   ├── config/          # Database pool initialization (db.js)
+│   ├── controllers/     # Request/response validation & handlers (githubController.js)
+│   ├── services/        # Business logic & Database CRUD operations (githubService.js)
+│   ├── routes/          # Express route bindings (githubRoutes.js)
+│   ├── middleware/      # Error handler, Logger, & Request Validator
+│   ├── utils/           # Computations and custom formulas (analyzer.js)
+│   └── app.js           # Server bootstrapper & middleware configuration
+├── database.sql         # Clean SQL table schemas
+├── .env.example         # Template file for environment config
+├── package.json         # Scripts and dependencies
+└── README.md            # Detailed documentation
+```
 
 ---
 
 ## ⚙️ Environment Variables
+Create a `.env` file in the root directory and copy details from `.env.example`:
 
-Copy `.env.example` to `.env` in the root directory:
-
-```bash
-cp .env.example .env
-```
-
-Define the configuration variables inside `.env`:
-
-| Variable | Description | Default |
+| Key | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | The port the application will run on | `3000` |
-| `NODE_ENV` | Environment mode (`development` or `production`) | `development` |
-| `DB_HOST` | MySQL host address | `127.0.0.1` |
-| `DB_PORT` | MySQL database port | `3306` |
+| `PORT` | Local host port | `5000` |
+| `DB_HOST` | MySQL hostname | `127.0.0.1` |
+| `DB_PORT` | MySQL connection port | `3306` |
 | `DB_USER` | MySQL database user | `root` |
-| `DB_PASSWORD`| MySQL database password | `""` |
-| `DB_NAME` | MySQL database name | `github_analyzer_db` |
-| `GITHUB_TOKEN`| **(Highly Recommended)** GitHub Personal Access Token (PAT) to increase API rate limit from 60 to 5000 requests/hr. | *None* |
-| `RATE_LIMIT_WINDOW_MS`| Rate limit time window in milliseconds | `900000` (15 mins) |
-| `RATE_LIMIT_MAX` | Max allowed requests per IP within the window | `100` |
+| `DB_PASSWORD` | MySQL user password | *None* |
+| `DB_NAME` | Database name | `railway` |
+| `NODE_ENV` | Environment state | `production` |
+| `GITHUB_TOKEN` | (Optional) GitHub Token to increase rate limits | *None* |
+| `RATE_LIMIT_WINDOW_MS` | Rate limiting timeframe (in ms) | `900000` (15m) |
+| `RATE_LIMIT_MAX` | Max allowed requests per IP per window | `100` |
 
 ---
 
-## 🗄️ Database Setup
-
-Create the database and table using the provided `database.sql` script:
-
-```bash
-# Log into MySQL CLI
-mysql -u root -p
-
-# Run the SQL schema script
-mysql -u root -p < database.sql
-```
-
-### Table Structure (`github_profiles`)
-
-| Column | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `INT` | Primary Key, Auto-increment |
-| `username` | `VARCHAR(100)` | GitHub username (Unique, Indexed) |
-| `name` | `VARCHAR(255)` | Public display name |
-| `bio` | `TEXT` | GitHub bio statement |
-| `avatar_url` | `VARCHAR(500)` | Public avatar URL |
-| `github_url` | `VARCHAR(500)` | Link to GitHub profile |
-| `followers` | `INT` | Total followers count |
-| `following` | `INT` | Total following count |
-| `public_repos` | `INT` | Public repositories count |
-| `public_gists` | `INT` | Public gists count |
-| `account_created_at`| `TIMESTAMP` | GitHub account creation date |
-| `top_language` | `VARCHAR(100)` | Main language used across repositories |
-| `total_stars` | `INT` | Sum of stars across all repositories |
-| `total_forks` | `INT` | Sum of forks across all repositories |
-| `engagement_score` | `DECIMAL(6,2)` | Computed metric: `followers * 0.4 + repos * 0.3 + stars * 0.3` |
-| `profile_level` | `VARCHAR(50)` | Score tier: `Beginner`, `Intermediate`, `Advanced`, `Expert` |
-| `languages_breakdown` | `JSON` | Counts of repositories by language |
-| `top_repos` | `JSON` | List of top 5 starred repositories |
-| `analysis_date` | `TIMESTAMP` | Time stamp of the last analysis/refresh |
-
----
-
-## 🚀 Installation & Local Run
+## 🚀 Installation Steps
 
 1. **Clone the repository and install dependencies**:
    ```bash
    npm install
    ```
 
-2. **Run database scripts** and configure `.env` (refer to the **Database Setup** section).
-
-3. **Start the application**:
-
-   **Development mode** (runs using native Node --watch reload):
+2. **Configure Environment Variables**:
+   Copy `.env.example` to `.env` and configure credentials:
    ```bash
-   npm run dev
+   cp .env.example .env
    ```
 
-   **Production mode**:
-   ```bash
-   npm start
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-5. Access Swagger documentation at [http://localhost:3000/api-docs](http://localhost:3000/api-docs).
+3. **Start the Application**:
+   - **Development (With Nodemon)**:
+     ```bash
+     npm run dev
+     ```
+   - **Production**:
+     ```bash
+     npm start
+     ```
 
 ---
 
-## 📌 API Endpoints
+## 🗄️ Railway Database Setup
+1. Sign up/Log in to [Railway](https://railway.app/).
+2. Click **New Project** and select **Provision MySQL**.
+3. Once initialized, select the MySQL service, navigate to **Variables**, and copy the credentials:
+   - `MYSQLHOST` (Host)
+   - `MYSQLPORT` (Port)
+   - `MYSQLUSER` (User)
+   - `MYSQLPASSWORD` (Password)
+   - `MYSQLDATABASE` (Name, defaults to `railway`)
+4. To initialize tables manually, run the queries inside `database.sql` using a database GUI client (like DBeaver or TablePlus) or the command line:
+   ```bash
+   mysql -h <MYSQLHOST> -P <MYSQLPORT> -u <MYSQLUSER> -p<MYSQLPASSWORD> railway < database.sql
+   ```
+   *Note: Our application's `src/config/db.js` will automatically check for and create the table on boot if it does not exist.*
 
-### 1. Health Check
+---
+
+## 🌐 Render Deployment Steps
+1. Sign up/Log in to [Render](https://render.com/).
+2. Click **New** -> **Web Service**.
+3. Connect your GitHub repository containing the project.
+4. Set the build parameters:
+   - **Name**: `github-profile-analyzer-api`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+5. Go to the **Environment** tab of your Render service and add your variables copied from Railway:
+   - `NODE_ENV`: `production`
+   - `PORT`: `5000` (Render overrides this automatically, but setting it maintains consistency)
+   - `DB_HOST`: *(Railway MYSQLHOST)*
+   - `DB_PORT`: *(Railway MYSQLPORT)*
+   - `DB_USER`: *(Railway MYSQLUSER)*
+   - `DB_PASSWORD`: *(Railway MYSQLPASSWORD)*
+   - `DB_NAME`: `railway`
+   - `GITHUB_TOKEN`: *(your github PAT)*
+6. Click **Deploy Web Service**. Render will build and expose the web service under a public HTTPS URL.
+
+---
+
+## 📌 API Endpoints & Examples
+
+### 1. Health Status
 - **Endpoint**: `GET /health`
-- **Description**: Returns server status and MySQL database connectivity.
+- **Description**: Verifies API running status and DB connection.
+- **Example Response (200 OK)**:
+  ```json
+  {
+    "success": true,
+    "status": "UP",
+    "timestamp": "2026-06-07T12:00:00.000Z",
+    "database": "Connected"
+  }
+  ```
 
 ### 2. Analyze Profile
 - **Endpoint**: `POST /api/profiles/analyze`
-- **Request Body**:
+- **Example Request Body**:
   ```json
   {
     "username": "torvalds"
   }
   ```
-- **Response (201 Created / 200 OK if cached)**:
+- **Example Response (201 Created)**:
   ```json
   {
     "success": true,
@@ -148,83 +155,65 @@ mysql -u root -p < database.sql
       "bio": "The Creator of Linux & Git",
       "avatar_url": "https://avatars.githubusercontent.com/u/1024025?v=4",
       "github_url": "https://github.com/torvalds",
-      "followers": 204900,
+      "followers": 207572,
       "following": 0,
       "public_repos": 7,
       "public_gists": 0,
       "account_created_at": "2011-09-03T15:26:40.000Z",
       "top_language": "C",
-      "total_stars": 194120,
-      "total_forks": 38100,
-      "engagement_score": 140198.10,
+      "total_stars": 221087,
+      "total_forks": 54020,
+      "engagement_score": 149354.90,
       "profile_level": "Expert",
       "languages_breakdown": {
         "C": 5,
-        "Shell": 1,
-        "Assembly": 1
+        "Assembly": 1,
+        "Shell": 1
       },
       "top_repos": [
         {
           "name": "linux",
           "description": "Linux kernel source tree",
-          "stars": 169000,
-          "forks": 49000,
+          "stars": 176210,
+          "forks": 51759,
           "url": "https://github.com/torvalds/linux"
         }
       ],
-      "analysis_date": "2026-06-07T14:50:00.000Z"
+      "analysis_date": "2026-06-07T10:35:44.000Z"
     }
   }
   ```
 
 ### 3. Get All Profiles
 - **Endpoint**: `GET /api/profiles`
-- **Supported Parameters**:
+- **Supported Query Parameters**:
   - `page`: Page number (default: `1`)
-  - `limit`: Records per page (default: `10`, max: `100`)
+  - `limit`: Records per page (default: `10`)
   - `sort`: Column name to sort by (default: `analysis_date`)
   - `order`: Sort order: `ASC` or `DESC` (default: `DESC`)
-  - `search`: Matches characters in `username` or `name`
-- **Example**: `GET /api/profiles?page=1&limit=2&sort=engagement_score&order=DESC&search=linus`
+  - `search`: Matching filter for `username` or `name`
+- **Example Request**: `/api/profiles?page=1&limit=5&sort=engagement_score&order=DESC&search=linus`
 
 ### 4. Get Single Profile
 - **Endpoint**: `GET /api/profiles/:username`
-- **Description**: Returns local DB analysis for `username`. Returns `404` if not found in database cache.
+- **Example Request**: `GET /api/profiles/torvalds`
 
-### 5. Refresh Analysis
+### 5. Refresh Profile
 - **Endpoint**: `POST /api/profiles/:username/refresh`
-- **Description**: Bypasses local database cache, pulls the latest data directly from the GitHub API, computes metrics, and updates the local record.
+- **Example Request**: `POST /api/profiles/torvalds/refresh`
 
 ### 6. Delete Profile
 - **Endpoint**: `DELETE /api/profiles/:username`
-- **Description**: Deletes the analyzed profile records for the given username.
+- **Example Request**: `DELETE /api/profiles/torvalds`
 
 ---
 
 ## 🗂️ Postman Collection Usage
-
-1. Open Postman.
-2. Click **Import** in the top left.
-3. Select the `postman_collection.json` file from the project root.
-4. The collection defines a collection variable `baseUrl` (default: `http://localhost:3000`). If your local server is on a different port, update the variable in the collection settings.
-5. All requests have pre-configured JSON bodies and queries for instant execution.
+1. Open Postman, click **Import** and select the `postman_collection.json` file in the project root.
+2. In the collection variables, confirm that `baseUrl` is set to the correct active host (e.g. `http://localhost:5000` or your Render service link).
+3. Run the requests sequentially to verify full CRUD lifecycle operations.
 
 ---
 
-## 🌐 Deployment Guide
-
-This application is ready to deploy to PaaS platforms like **Render**.
-
-### Render Deployment
-
-1. Set up a **Web Service** on Render connected to your Git repository.
-2. Select **Node** environment.
-3. Build command: `npm install`
-4. Start command: `npm start`
-5. Provision a **Render MySQL Database** (or use an external database service like Aiven/PlanetScale).
-6. Under the Web Service **Environment** tab, enter the database connection credentials in the corresponding keys (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`).
-7. Execute the `database.sql` script to create tables in the remote database.
-
-
-## Author
-  Shivam Kumar
+## ✍️ Author
+Shivam Kumar
