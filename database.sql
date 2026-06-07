@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS github_profiles (
     top_language VARCHAR(100) NULL,
     total_stars INT NOT NULL DEFAULT 0,
     total_forks INT NOT NULL DEFAULT 0,
-    engagement_score DECIMAL(6, 2) NOT NULL DEFAULT 0.00,
+    engagement_score DOUBLE NOT NULL DEFAULT 0,
     profile_level VARCHAR(50) NOT NULL,
     languages_breakdown JSON NULL,
     top_repos JSON NULL,
