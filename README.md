@@ -213,28 +213,9 @@ mysql -u root -p < database.sql
 
 ## 🌐 Deployment Guide
 
-This application is ready to deploy to PaaS platforms like **Render** or **Railway**.
+This application is ready to deploy to PaaS platforms like **Render**.
 
-### 1. Railway Deployment
-
-Railway offers a built-in MySQL provisioner and is highly recommended.
-
-1. Create a Railway account and click **New Project**.
-2. Select **Provision MySQL**.
-3. Under the database settings, copy the database connection details.
-4. Click **New** -> **Github Repo** and select this repository.
-5. Go to the service **Variables** tab and map the environment variables:
-   - `PORT`: `${PORT}` (provided automatically)
-   - `DB_HOST`: `${MYSQLHOST}` (or manual hostname)
-   - `DB_PORT`: `${MYSQLPORT}`
-   - `DB_USER`: `${MYSQLUSER}`
-   - `DB_PASSWORD`: `${MYSQLPASSWORD}`
-   - `DB_NAME`: `${MYSQLDATABASE}`
-   - `GITHUB_TOKEN`: *(your personal github token for high limits)*
-   - `NODE_ENV`: `production`
-6. Run the queries in `database.sql` against the Railway MySQL service using your favorite client (DBeaver, MySQL Workbench) or Railway SQL query CLI.
-
-### 2. Render Deployment
+### Render Deployment
 
 1. Set up a **Web Service** on Render connected to your Git repository.
 2. Select **Node** environment.
