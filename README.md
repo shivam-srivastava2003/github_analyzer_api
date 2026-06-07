@@ -224,3 +224,7 @@ This application is ready to deploy to PaaS platforms like **Render**.
 5. Provision a **Render MySQL Database** (or use an external database service like Aiven/PlanetScale).
 6. Under the Web Service **Environment** tab, enter the database connection credentials in the corresponding keys (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`).
 7. Execute the `database.sql` script to create tables in the remote database.
+
+
+## Author
+  Shivam Kumar
