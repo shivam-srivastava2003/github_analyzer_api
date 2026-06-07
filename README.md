@@ -342,15 +342,15 @@ Returned when unexpected database errors or system failures occur.
 ---
 
 ## 🔗 Live Demo
-- **Live API**: [https://your-render-url.onrender.com](https://your-render-url.onrender.com)
-- **GitHub Repository**: [https://github.com/your-username/github-analyzer-api](https://github.com/your-username/github-analyzer-api)
+- **Live API**: [https://github-analyzer-api-1iwr.onrender.com](https://github-analyzer-api-1iwr.onrender.com)
+- **GitHub Repository**: [https://github.com/shivam-srivastava2003/github_analyzer_api](https://github.com/shivam-srivastava2003/github_analyzer_api)
 
 ---
 
 ## 🧪 Testing
 A complete Postman collection is included in the project root to enable rapid testing.
-1. Import **[postman_collection.json](file:///d:/Project/Github_Api/postman_collection.json)** into Postman.
-2. In the collection variables, verify that `baseUrl` matches the target host (e.g. `http://localhost:5000` or your Render live link).
+1. Import **[postman_collection.json](https://github.com/shivam-srivastava2003/github_analyzer_api/blob/main/postman_collection.json)** into Postman.
+2. In the collection variables, verify that `baseUrl` matches the target host (e.g. `https://github-analyzer-api-1iwr.onrender.com`).
 3. Execute requests sequentially to test validation, CRUD actions, and caching metrics.
 
 ---
