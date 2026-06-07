@@ -1,0 +1,30 @@
+-- Create Database if not exists
+CREATE DATABASE IF NOT EXISTS github_analyzer_db;
+USE github_analyzer_db;
+
+-- Create Table: github_profiles
+CREATE TABLE IF NOT EXISTS github_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(255) NULL,
+    bio TEXT NULL,
+    avatar_url VARCHAR(500) NULL,
+    github_url VARCHAR(500) NOT NULL,
+    followers INT NOT NULL DEFAULT 0,
+    following INT NOT NULL DEFAULT 0,
+    public_repos INT NOT NULL DEFAULT 0,
+    public_gists INT NOT NULL DEFAULT 0,
+    account_created_at TIMESTAMP NULL,
+    top_language VARCHAR(100) NULL,
+    total_stars INT NOT NULL DEFAULT 0,
+    total_forks INT NOT NULL DEFAULT 0,
+    engagement_score DECIMAL(6, 2) NOT NULL DEFAULT 0.00,
+    profile_level VARCHAR(50) NOT NULL,
+    languages_breakdown JSON NULL,
+    top_repos JSON NULL,
+    analysis_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_username (username),
+    INDEX idx_engagement_score (engagement_score),
+    INDEX idx_followers (followers),
+    INDEX idx_analysis_date (analysis_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

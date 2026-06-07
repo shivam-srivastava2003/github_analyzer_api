@@ -1,0 +1,225 @@
+{
+  "info": {
+    "_postman_id": "8b08d75e-cfc2-48ea-aa2d-0e42d76f82db",
+    "name": "GitHub Profile Analyzer API",
+    "description": "Postman Collection to test all endpoints of the GitHub Profile Analyzer API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        },
+        "description": "Check API and database status."
+      },
+      "response": []
+    },
+    {
+      "name": "Swagger UI Docs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api-docs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api-docs"
+          ]
+        },
+        "description": "View interactive Swagger API Documentation."
+      },
+      "response": []
+    },
+    {
+      "name": "Welcome Page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        },
+        "description": "Verify the server is running."
+      },
+      "response": []
+    },
+    {
+      "name": "Analyze Profile",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"torvalds\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/analyze",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profiles",
+            "analyze"
+          ]
+        },
+        "description": "Analyze a user profile. If found in local DB, acts as cache hit. If not found, fetches from GitHub, processes, saves to DB, and returns."
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Profiles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles?page=1&limit=10&sort=engagement_score&order=DESC&search=",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profiles"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1",
+              "description": "Page number (defaults to 1)"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Profiles count per page (defaults to 10)"
+            },
+            {
+              "key": "sort",
+              "value": "engagement_score",
+              "description": "Field to sort by (followers, engagement_score, etc.)"
+            },
+            {
+              "key": "order",
+              "value": "DESC",
+              "description": "ASC or DESC"
+            },
+            {
+              "key": "search",
+              "value": "",
+              "description": "Search keyword matching username or name"
+            }
+          ]
+        },
+        "description": "Retrieve paginated, sorted, and searched database profiles."
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/torvalds",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profiles",
+            "torvalds"
+          ]
+        },
+        "description": "Fetch a single analyzed profile from the database using the username."
+      },
+      "response": []
+    },
+    {
+      "name": "Refresh Profile",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/torvalds/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profiles",
+            "torvalds",
+            "refresh"
+          ]
+        },
+        "description": "Force update and re-analyze profile data from the GitHub API and save to the database."
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Profile",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/profiles/torvalds",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "profiles",
+            "torvalds"
+          ]
+        },
+        "description": "Remove an analyzed profile from the database."
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
